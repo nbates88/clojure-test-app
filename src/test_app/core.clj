@@ -12,15 +12,15 @@
    :space {:regexp #" "
            :keys [:lastname :firstname :middleinitial :gender :dob :color]}})
 
-(defn determine-delimeter [line]
+(defn determine-delimiter [line]
   (cond
     (re-find #"," line) :comma
     (re-find #"\|" line) :pipe
     :else :space))
 
 (defn parse-line [line]
-  (let [delimeter (determine-delimeter line)
-        file-info (get file-types delimeter)]
+  (let [delimiter (determine-delimiter line)
+        file-info (get file-types delimiter)]
     (zipmap (:keys file-info)
             (map str/trim (str/split line (:regexp file-info))))))
 
@@ -33,12 +33,17 @@
       (= outcome 0) (compare (:lastname p1) (:lastname p2))
       :else outcome)))
 
+(defn gender-sort [people]
+  (sort-by (juxt :gender :lastname) people))
+
+(defn name-sort [people] (sort-by :lastname #(compare %2 %1) people))
 
 (defn normalize-gender [gender]
-  (cond
-    (= gender "F") "Female"
-    (= gender "M") "Male"
-    :else gender))
+  (let [g (str/upper-case (str/trim gender))]
+    (cond
+      (= g "F") "Female"
+      (= g "M") "Male"
+      :else gender)))
 
 (defn normalize-date [date] (str/replace date #"-" "/"))
 
@@ -58,8 +63,8 @@
   (let [raw-data (flatten (map read-file files))
         parsed-data (map parse-line raw-data)
         normalized-data (map normalize parsed-data)
-        name-sorted (sort-by :lastname #(compare %2 %1) normalized-data)
-        gender-sorted (sort-by (juxt :gender :lastname) normalized-data)
+        name-sorted (name-sort normalized-data)
+        gender-sorted (gender-sort normalized-data)
         dob-sorted (sort dob-sort normalized-data)]
     (doall (map println
                 (map print-people (list name-sorted gender-sorted dob-sorted))))))
