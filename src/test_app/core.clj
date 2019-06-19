@@ -24,6 +24,16 @@
     (zipmap (:keys file-info)
             (map str/trim (str/split line (:regexp file-info))))))
 
+(defn dob-sort [p1, p2]
+  (let [df (java.text.SimpleDateFormat. "MM/dd/yyyy")
+        pd1 (.parse df (:dob p1))
+        pd2 (.parse df (:dob p2))
+        outcome (compare pd1 pd2)]
+    (cond
+      (= outcome 0) (compare (:lastname p1) (:lastname p2))
+      :else outcome)))
+
+
 (defn normalize-gender [gender]
   (cond
     (= gender "F") "Female"
@@ -32,13 +42,12 @@
 
 (defn normalize-date [date] (str/replace date #"-" "/"))
 
-(defn normalize [person] (dissoc
-                          (update
-                           (update person :gender normalize-gender) :dob normalize-date)
-                          :middleinitial))
+(defn normalize [person]
+  (update
+   (update person :gender normalize-gender) :dob normalize-date))
 
 (defn print-person [person]
-  (str/join " " (vals person)))
+  (str/join " " (vals (select-keys person [:lastname :firstname :gender :dob :color]))))
 
 (defn print-people [people]
   (str/join "\n" (map print-person people)))
@@ -51,7 +60,7 @@
         normalized-data (map normalize parsed-data)
         name-sorted (sort-by :lastname #(compare %2 %1) normalized-data)
         gender-sorted (sort-by (juxt :gender :lastname) normalized-data)
-        dob-sorted (sort-by (juxt :dob :lastname) normalized-data)]
+        dob-sorted (sort dob-sort normalized-data)]
     (doall (map println
                 (map print-people (list name-sorted gender-sorted dob-sorted))))))
 
