@@ -17,3 +17,4 @@
                 (map print-people (list name-sorted gender-sorted dob-sorted))))))
 
 
+;; use ->> here instead?

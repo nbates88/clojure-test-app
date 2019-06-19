@@ -4,25 +4,25 @@
 
 (defn read-file [file] (str/split (slurp file) #"\n"))
 
-(def file-types
-  {:comma {:regexp #","
-           :keys [:lastname :firstname :gender :color :dob]}
-   :pipe {:regexp #"\|"
-          :keys [:lastname :firstname :middleinitial :gender :color :dob]}
-   :space {:regexp #" "
-           :keys [:lastname :firstname :middleinitial :gender :dob :color]}})
-
 (defn determine-delimiter [line]
   (cond
     (re-find #"," line) :comma
     (re-find #"\|" line) :pipe
     :else :space))
 
-(defn parse-line [line]
-  (let [delimiter (determine-delimiter line)
-        file-info (get file-types delimiter)]
-    (zipmap (:keys file-info)
-            (map str/trim (str/split line (:regexp file-info))))))
+(defmulti parse-line determine-delimiter)
+
+(defmethod parse-line :comma [line]
+  (zipmap [:lastname :firstname :gender :color :dob]
+          (map str/trim (str/split line #","))))
+
+(defmethod parse-line :pipe [line]
+  (zipmap [:lastname :firstname :middleinitial :gender :color :dob]
+          (map str/trim (str/split line #"\|"))))
+
+(defmethod parse-line :space [line]
+  (zipmap [:lastname :firstname :middleinitial :gender :dob :color]
+          (map str/trim (str/split line #" "))))
 
 (defn read-and-parse [files]
   (let [raw-data (flatten (map read-file files))] (map parse-line raw-data)))

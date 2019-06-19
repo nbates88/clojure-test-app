@@ -6,11 +6,11 @@
         pd1 (.parse df (:dob p1))
         pd2 (.parse df (:dob p2))
         outcome (compare pd1 pd2)]
-    (cond
-      (= outcome 0) (compare (:lastname p1) (:lastname p2))
-      :else outcome)))
+    (if (= outcome 0) (compare (:lastname p1) (:lastname p2)) outcome)))
 
 (defn gender-sort [people]
   (sort-by (juxt :gender :lastname) people))
 
 (defn name-sort [people] (sort-by :lastname #(compare %2 %1) people))
+
+
