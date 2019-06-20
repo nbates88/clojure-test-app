@@ -6,15 +6,13 @@
             [test-app.printer :refer :all])
   (:gen-class))
 
+
 (defn -main
   [& files]
-  (let [parsed-data (read-and-parse files)
-        normalized-data (map normalize parsed-data)
-        name-sorted (name-sort normalized-data)
-        gender-sorted (gender-sort normalized-data)
-        dob-sorted (sort dob-sort normalized-data)]
-    (doall (map println
-                (map print-people (list name-sorted gender-sorted dob-sorted))))))
-
-
-;; use ->> here instead?
+  (->> files
+       read-and-parse
+       (map normalize)
+       do-sort
+       (map print-people)
+       (map println)
+       doall))

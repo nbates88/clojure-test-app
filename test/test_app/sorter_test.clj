@@ -3,11 +3,11 @@
             [test-app.sorter :refer :all]))
 
 (deftest dob-sort-test
-  (is (= 0 (dob-sort {:dob "10/12/2019"} {:dob "10/12/2019"})))
-  (is (= -1 (dob-sort {:dob "10/12/2017"} {:dob "10/12/2019"})))
-  (is (= 1 (dob-sort {:dob "10/12/2019"} {:dob "10/12/2017"})))
-  (is (= 1 (dob-sort {:dob "10/12/2019" :lastname "Burger"} {:dob "10/12/2019" :lastname "Apple"})))
-  (is (= -1 (dob-sort {:dob "10/12/2019" :lastname "Apple"} {:dob "10/12/2019" :lastname "Burger"}))))
+  (is (= 0 (dob-comparator {:dob "10/12/2019"} {:dob "10/12/2019"})))
+  (is (= -1 (dob-comparator {:dob "10/12/2017"} {:dob "10/12/2019"})))
+  (is (= 1 (dob-comparator {:dob "10/12/2019"} {:dob "10/12/2017"})))
+  (is (= 1 (dob-comparator {:dob "10/12/2019" :lastname "Burger"} {:dob "10/12/2019" :lastname "Apple"})))
+  (is (= -1 (dob-comparator {:dob "10/12/2019" :lastname "Apple"} {:dob "10/12/2019" :lastname "Burger"}))))
 
 (deftest gender-sort-test
   (is (= [{:gender "Female"} {:gender "Male"}] (gender-sort [{:gender "Male"} {:gender "Female"}])))
